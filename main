@@ -1,0 +1,38 @@
+"""
+Created on Fri Apr 21 14:56:56 2023
+
+@author: Noah Caulfield
+
+Youtube to .mp3 downloader.
+Takes url as command line argument and downloads affiliated audio
+"""
+
+import os
+import argparse
+from pytube import YouTube
+from moviepy.editor import *
+
+# Create argument parser to accept YouTube URL as input
+parser = argparse.ArgumentParser(description='Download a YouTube video as an MP3 file.')
+parser.add_argument('url', type=str, help='The URL of the YouTube video to download.')
+args = parser.parse_args()
+
+# Download the YouTube video
+yt = YouTube(args.url)
+title = yt.title
+video_stream = yt.streams.filter(only_audio=True).first()
+downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
+video_stream.download(output_path=downloads_folder)
+
+# Convert the video to MP3
+mp4_file = os.path.join(downloads_folder, title + '.mp4')
+mp3_file = os.path.join(downloads_folder, title + '.mp3')
+videoclip = AudioFileClip(mp4_file)
+videoclip.write_audiofile(mp3_file)
+
+# Clean up the downloaded files
+os.remove(mp4_file)
+
+print("File downloaded")
+Print("File saved to Downloads")
+
